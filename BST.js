@@ -1,27 +1,50 @@
 class Node {
-  data = null;
+  value = null;
   left = null;
   right = null;
 }
 
 class Tree {
-  root = buildTree()
+  root = buildTree();
 
   buildTree(arr) {
-    // build balanced binary tree of nodes from arr
+    // base case
+    if (arr.length < 1) {
+      return null;
+    }
+    // sort copy of array
+    const copy = arr.slice();
+    copy.sort();
+    // find midpoint of array
+    let mid = Math.floor(copy.length / 2);
+    // set root as middle value
+    const rootNode = new Node();
+    rootNode.value = copy[mid];
+    // if no children, return curr node
+    if (copy.length <= 1) {
+      rootNode.left = null;
+      rootNode.right = null;
+      return rootNode;
+    };
+    // set left and right children
+    let left = copy.slice(0, mid);
+    let right = copy.slice(mid + 1, copy.length);
+    rootNode.left = buildTree(left);
+    rootNode.right = buildTree(right);
     // return root node
+    return rootNode;
   }
 
   insert(value) {
     // create a node with value
     // insert node into appropriate place in the tree
-    // rebalance tree
+    // rebalance tree?
   }
 
   delete(value) {
     // find node with value
     // delete node from tree
-    // rebalance tree
+    // rebalance tree?
   }
 
   find(value) {
