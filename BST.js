@@ -5,16 +5,20 @@ class Node {
 }
 
 class Tree {
-  root = buildTree();
+  root = this.buildTree()
 
-  buildTree(arr) {
+  hello() {
+    return "hello world"
+  }
+
+  buildTree(arr = []) {
     // base case
     if (arr.length < 1) {
       return null;
     }
     // sort copy of array
     const copy = arr.slice();
-    copy.sort();
+    copy.sort((a, b) => a - b);
     // find midpoint of array
     let mid = Math.floor(copy.length / 2);
     // set root as middle value
@@ -29,8 +33,8 @@ class Tree {
     // set left and right children
     let left = copy.slice(0, mid);
     let right = copy.slice(mid + 1, copy.length);
-    rootNode.left = buildTree(left);
-    rootNode.right = buildTree(right);
+    rootNode.left = this.buildTree(left);
+    rootNode.right = this.buildTree(right);
     // return root node
     return rootNode;
   }
@@ -63,11 +67,24 @@ class Tree {
     // return
   }
 
-  preOrder(fn) { // set default function to return array of values
+  preOrder(root, fn = (node) => {
+    return node
+  }) { // set default function to return array of values
     // if root is null, return null
-    // push root to array
+    if (root === null) {
+      return null;
+    };
+    // call fn on root
+    console.log(fn(root).value);
     // recurse left
+    if (root.left) {
+      this.preOrder(root.left, fn)
+    }
     // recurse right
+    if (root.right) {
+      this.preOrder(root.right, fn)
+    }
+    return // what, what do I return? lol
   }
 
   inOrder(fn) { // set default function to return array of values
@@ -117,16 +134,16 @@ class Tree {
       return;
     }
     if (node.right !== null) {
-      prettyPrint(
+      this.prettyPrint(
         node.right,
         `${prefix}${isLeft ? "│   " : "    "}`, false
       );
     }
     console.log(
-      `${prefix}${isLeft ? "└── " : "┌── "}${node.data}`
+      `${prefix}${isLeft ? "└── " : "┌── "}${node.value}`
     );
     if (node.left !== null) {
-      prettyPrint(
+      this.prettyPrint(
         node.left,
         `${prefix}${isLeft ? "    " : "│   "}`, true
       );
@@ -170,10 +187,15 @@ function createRandomBST() {
 function createRandomNumArray(num) {
   arr = []
   for (let i = 0; i < num; i++) {
-    arr.push(Math.floor(Math.random() * 1000));
+    arr.push(Math.floor(Math.random() * 100));
   }
   arr.sort()
   return arr
 }
 
-console.log(createRandomNumArray(100));
+let test = new Tree();
+
+test.root = test.buildTree([1, 3, 2, 4, 8, 6, 7, 5, 9, 10]);
+
+test.prettyPrint(test.root);
+console.log(test.preOrder(test.root))
