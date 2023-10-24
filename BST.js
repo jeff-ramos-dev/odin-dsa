@@ -2,6 +2,12 @@ class Node {
   value = null;
   left = null;
   right = null;
+
+  constructor(val=null, l=null, r=null) {
+    this.value = val;
+    this.left = l;
+    this.right = r;
+  }
 }
 
 class Tree {
@@ -16,23 +22,21 @@ class Tree {
     if (arr.length < 1) {
       return null;
     }
+    // clean duplicates
+    const cleanCopy = [...new Set(arr)];
     // sort copy of array
-    const copy = arr.slice();
-    copy.sort((a, b) => a - b);
+    cleanCopy.sort((a, b) => a - b);
     // find midpoint of array
-    let mid = Math.floor(copy.length / 2);
+    let mid = Math.floor(cleanCopy.length / 2);
     // set root as middle value
-    const rootNode = new Node();
-    rootNode.value = copy[mid];
+    const rootNode = new Node(cleanCopy[mid]);
     // if no children, return curr node
-    if (copy.length <= 1) {
-      rootNode.left = null;
-      rootNode.right = null;
+    if (cleanCopy.length <= 1) {
       return rootNode;
     };
     // set left and right children
-    let left = copy.slice(0, mid);
-    let right = copy.slice(mid + 1, copy.length);
+    let left = cleanCopy.slice(0, mid);
+    let right = cleanCopy.slice(mid + 1, cleanCopy.length);
     rootNode.left = this.buildTree(left);
     rootNode.right = this.buildTree(right);
     // return root node
@@ -41,7 +45,30 @@ class Tree {
 
   insert(value) {
     // create a node with value
+    const node = new Node(value);
+    // set current node to root
+    let curr = this.root;
     // insert node into appropriate place in the tree
+    while (curr) {
+      if (value > curr.value) {
+        if (curr.right) {
+          curr = curr.right;
+        } else {
+          curr.right = node;
+          curr = null
+        }
+      } else if (value < curr.value) {
+        if (curr.left) {
+          curr = curr.left;
+        } else {
+          curr.left = node;
+          curr = null
+        }
+      } else {
+        return
+      }
+    }
+    return
     // rebalance tree?
   }
 
@@ -52,8 +79,23 @@ class Tree {
   }
 
   find(value) {
+    // return false if no root
+    if (!this.root) {
+      return null
+    }
+    // set current node to root
+    let curr = this.root
     // traverse tree to find node
-    // return the node if it exists
+    while (curr) {
+      if (value > curr.value) {
+        curr = curr.right
+      } else if (value < curr.value) {
+        curr = curr.left
+      } else {
+        return curr
+      }
+    }
+    return null
   }
 
   levelOrder(fn) { // set default function to return array of values
@@ -68,37 +110,69 @@ class Tree {
   }
 
   preOrder(root, fn = (node) => {
-    return node
+    return node.value
   }) { // set default function to return array of values
     // if root is null, return null
     if (root === null) {
       return null;
     };
+    // initialize output array
+    let outputArray = []
     // call fn on root
-    console.log(fn(root).value);
+    outputArray.push(fn(root))
     // recurse left
     if (root.left) {
-      this.preOrder(root.left, fn)
+      outputArray = outputArray.concat(this.preOrder(root.left, fn))
     }
     // recurse right
     if (root.right) {
-      this.preOrder(root.right, fn)
+      outputArray = outputArray.concat(this.preOrder(root.right, fn))
     }
-    return // what, what do I return? lol
+    return outputArray
   }
 
-  inOrder(fn) { // set default function to return array of values
+  inOrder(root, fn = (node) => {
+    return node.value
+  }) { // set default function to return array of values
     // if root is null, return null
+    if (root === null) {
+      return null;
+    }
+    // initialize output array
+    let outputArray = [];
     // recurse left
+    if (root.left) {
+      outputArray = outputArray.concat(this.inOrder(root.left, fn));
+    }
     // push root to array
+    outputArray.push(fn(root));
     // recurse right
+    if (root.right) {
+      outputArray = outputArray.concat(this.inOrder(root.right, fn));
+    }
+    return outputArray;
   }
 
-  postOrder(fn) { // set default function to return array of values
+  postOrder(root, fn = (node) => {
+    return node.value
+  }) { // set default function to return array of values
     // if root is null, return null
+    if (!root) {
+      return null;
+    }
+    // initialize output array
+    let outputArray = [];
     // recurse left
+    if (root.left) {
+      outputArray = outputArray.concat(this.postOrder(root.left, fn));
+    }
     // recurse right
+    if (root.right) {
+      outputArray = outputArray.concat(this.postOrder(root.right, fn));
+    }
     // push root to array
+    outputArray.push(fn(root));
+    return outputArray;
   }
 
   height(node) {
@@ -198,4 +272,12 @@ let test = new Tree();
 test.root = test.buildTree([1, 3, 2, 4, 8, 6, 7, 5, 9, 10]);
 
 test.prettyPrint(test.root);
-console.log(test.preOrder(test.root))
+// console.log(test.preOrder(test.root));
+// console.log(test.inOrder(test.root));
+// console.log(test.postOrder(test.root));
+// console.log(test.find(3));
+
+test.insert(20)
+test.insert(13)
+test.prettyPrint(test.root);
+
