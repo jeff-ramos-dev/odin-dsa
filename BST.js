@@ -164,20 +164,35 @@ class Tree {
     return null
   }
 
-  levelOrder(fn) { // set default function to return array of values
+  defaultFunction = (node) => node.value;
+
+  levelOrder(root=this.root, fn = this.defaultFunction) { // set default function to return array of values
     // if root is null, return
+    if (!root) {
+      return null;
+    }
+    const outputArray = [];
     // enqueue root node
+    const queue = [root];
     // while queue has elements in it
-    // act upon root node
-    // enqueue left child if it exists
-    // enqueue right child if it exists
-    // dequeue root node
+    while (queue.length) {
+      // dequeue and act upon queued node
+      let curr = queue.shift();
+      outputArray.push(fn(curr));
+      // enqueue left child if it exists
+      if (curr.left) {
+        queue.push(curr.left);
+      }
+      // enqueue right child if it exists
+      if (curr.right) {
+        queue.push(curr.right)
+      }
+    }
     // return
+    return outputArray;
   }
 
-  preOrder(root, fn = (node) => {
-    return node.value
-  }) { // set default function to return array of values
+  preOrder(root=this.root, fn = this.defaultFunction) { // set default function to return array of values
     // if root is null, return null
     if (root === null) {
       return null;
@@ -197,9 +212,7 @@ class Tree {
     return outputArray
   }
 
-  inOrder(root, fn = (node) => {
-    return node.value
-  }) { // set default function to return array of values
+  inOrder(root=this.root, fn = this.defaultFunction) { // set default function to return array of values
     // if root is null, return null
     if (root === null) {
       return null;
@@ -219,9 +232,7 @@ class Tree {
     return outputArray;
   }
 
-  postOrder(root, fn = (node) => {
-    return node.value
-  }) { // set default function to return array of values
+  postOrder(root=this.root, fn = this.defaultFunction) { // set default function to return array of values
     // if root is null, return null
     if (!root) {
       return null;
@@ -241,11 +252,13 @@ class Tree {
     return outputArray;
   }
 
-  height(node) {
-    // curr === node
-    // while curr has children
-    // curr === child
-    // add to height
+  height(root = this.root) {
+    if (!root) {
+      return -1;
+    }
+    const leftHeight = this.height(root.left);
+    const rightHeight = this.height(root.right);
+    return Math.max(leftHeight, rightHeight) + 1;
   }
 
   depth(node) {
@@ -353,3 +366,6 @@ test.prettyPrint(test.root);
 // test.delete(3);
 // test.prettyPrint(test.root);
 
+// console.log(test.levelOrder());
+
+console.log(test.height());
