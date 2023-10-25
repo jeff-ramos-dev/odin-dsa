@@ -18,37 +18,33 @@ class Tree {
   }
 
   buildTree(arr = []) {
-    // base case
     if (arr.length < 1) {
       return null;
     }
-    // clean duplicates
+
     const cleanCopy = [...new Set(arr)];
-    // sort copy of array
     cleanCopy.sort((a, b) => a - b);
-    // find midpoint of array
+
     let mid = Math.floor(cleanCopy.length / 2);
-    // set root as middle value
+
     const rootNode = new Node(cleanCopy[mid]);
-    // if no children, return curr node
+
     if (cleanCopy.length <= 1) {
       return rootNode;
     };
-    // set left and right children
+
     let left = cleanCopy.slice(0, mid);
     let right = cleanCopy.slice(mid + 1, cleanCopy.length);
+
     rootNode.left = this.buildTree(left);
     rootNode.right = this.buildTree(right);
-    // return root node
-    return rootNode;
+
   }
 
   insert(value) {
-    // create a node with value
     const node = new Node(value);
-    // set current node to root
     let curr = this.root;
-    // insert node into appropriate place in the tree
+
     while (curr) {
       if (value > curr.value) {
         if (curr.right) {
@@ -68,40 +64,32 @@ class Tree {
         return
       }
     }
+
     return
-    // rebalance tree?
   }
 
   delete(value) {
     let curr = this.root;
-    // find node with value
-    // if it doesn't exist, return
     if (!this.find(value)) {
       return;
     }
-    // if node to be deleted is the root, parent doesn't need to be considered, so just move the root to the left or right if it exists, and then attach the other side to the bottom of the new tree
+
     if (this.root.value === value) {
       if (this.root.left) {
         if (this.root.right) {
-          // if left and right side exist, move the root to the left side and set the right as needs to be attached
           let nodeToBeAttached = this.root.right;
           this.root = this.root.left;
-          // find right-most node of left side
           curr = this.root;
           while (curr.right) {
             curr = curr.right;
           }
-          // attach the right side to that node's right
           curr.right = nodeToBeAttached;
         } else {
-          // if no right side, just move the root down one
           this.root = this.root.left;
         }
       } else if (this.root.right) {
-        // if no left side, then just move the root down one
         this.root = this.root.right;
       } else {
-        // if no children, set root to null
         this.root = null
       }
     } else {
@@ -114,58 +102,45 @@ class Tree {
           curr = curr.right;
         }
       }
-      // found node, need to attach its children somewhere on the parent
       if (parent.right === curr) {
-        // if no children, delete node
         if (!curr.left && !curr.right) {
           parent.right = null;
         } else {
-          // attach parent's right to the deleted node's left
           if (curr.left) {
             parent.right = curr.left;
           }
-          // save a reference to the deleted node's right
           let nodeToBeAttached = curr.right;
-          // traverse down to the parent's right-most node
           curr = parent.right; 
           while (curr && curr.right) {
             curr = curr.right;
           }
-          // attach the deleted node's right side
           curr.right = nodeToBeAttached;
         }
       } else if (parent.left === curr) {
-        // if no children, delete node
         if (!curr.left && !curr.right) {
           parent.left = null;
         } else {
-          // attach parent's left to the deleted node's right
           if (curr.right) {
             parent.left = curr.right;
           }
-          // save a reference to the deleted nodes' left
           let nodeToBeAttached = curr.left;
-          // traverse down to the parent's left-most node
           curr = parent.left;
           while (curr && curr.left) {
             curr = curr.left;
           }
-          // attach the deleted node's left side
           curr.left = nodeToBeAttached;
         }
       }
     }
-    // rebalance tree?
   }
 
   find(value) {
-    // return false if no root
     if (!this.root) {
       return null
     }
-    // set current node to root
+
     let curr = this.root
-    // traverse tree to find node
+
     while (curr) {
       if (value > curr.value) {
         curr = curr.right
@@ -175,94 +150,92 @@ class Tree {
         return curr
       }
     }
+
     return null
   }
 
   defaultFunction = (node) => node.value;
 
-  levelOrder(root = this.root, fn = this.defaultFunction) { // set default function to return array of values
-    // if root is null, return
+  levelOrder(root = this.root, fn = this.defaultFunction) { 
     if (!root) {
       return null;
     }
+
     const outputArray = [];
-    // enqueue root node
     const queue = [root];
-    // while queue has elements in it
+
     while (queue.length) {
-      // dequeue and act upon queued node
       let curr = queue.shift();
       outputArray.push(fn(curr));
-      // enqueue left child if it exists
+
       if (curr.left) {
         queue.push(curr.left);
       }
-      // enqueue right child if it exists
+
       if (curr.right) {
         queue.push(curr.right)
       }
     }
-    // return
+
     return outputArray;
   }
 
-  preOrder(root = this.root, fn = this.defaultFunction) { // set default function to return array of values
-    // if root is null, return null
+  preOrder(root = this.root, fn = this.defaultFunction) { 
     if (root === null) {
       return null;
     };
-    // initialize output array
+
     let outputArray = []
-    // call fn on root
     outputArray.push(fn(root))
-    // recurse left
+
     if (root.left) {
       outputArray = outputArray.concat(this.preOrder(root.left, fn))
     }
-    // recurse right
+
     if (root.right) {
       outputArray = outputArray.concat(this.preOrder(root.right, fn))
     }
+
     return outputArray
   }
 
-  inOrder(root = this.root, fn = this.defaultFunction) { // set default function to return array of values
-    // if root is null, return null
+  inOrder(root = this.root, fn = this.defaultFunction) { 
     if (root === null) {
       return null;
     }
-    // initialize output array
+
     let outputArray = [];
-    // recurse left
+
     if (root.left) {
       outputArray = outputArray.concat(this.inOrder(root.left, fn));
     }
-    // push root to array
+
     outputArray.push(fn(root));
-    // recurse right
+
     if (root.right) {
       outputArray = outputArray.concat(this.inOrder(root.right, fn));
     }
+
     return outputArray;
   }
 
-  postOrder(root = this.root, fn = this.defaultFunction) { // set default function to return array of values
-    // if root is null, return null
+  postOrder(root = this.root, fn = this.defaultFunction) { 
     if (!root) {
       return null;
     }
-    // initialize output array
+
     let outputArray = [];
-    // recurse left
+
     if (root.left) {
       outputArray = outputArray.concat(this.postOrder(root.left, fn));
     }
-    // recurse right
+
     if (root.right) {
       outputArray = outputArray.concat(this.postOrder(root.right, fn));
     }
-    // push root to array
+
     outputArray.push(fn(root));
+
     return outputArray;
   }
 
@@ -270,8 +243,10 @@ class Tree {
     if (!root) {
       return -1;
     }
+
     const leftHeight = this.height(root.left);
     const rightHeight = this.height(root.right);
+
     return Math.max(leftHeight, rightHeight) + 1;
   }
 
@@ -279,33 +254,30 @@ class Tree {
     if (!this.find(node.value)) {
       return -1;
     }
-    // curr === root
+
     let curr = this.root
     let depth = 0
-    // while curr !== node
+
     while (curr !== node) {
-    // curr === child
       if (node.value < curr.value) {
         curr = curr.left;
       } else {
         curr = curr.right
       }
-    // add to depth
       depth++
     }
+
     return depth;
   }
 
   isBalanced(root = this.root) {
-    // if root is null, return true?
     if (!root) {
       return true;
     }
-    // recurse down left subtree, call height on each leaf node
+
     const leftHeight = this.height(root.left);
-    // recurse down right subtree, call height on each leaf node
     const rightHeight = this.height(root.right);
-    // if 2 > left height - right height > -2
+
     if (Math.abs(leftHeight - rightHeight) <= 1) {
       if (this.isBalanced(root.left) && this.isBalanced(root.right)) {
         return true
@@ -316,25 +288,28 @@ class Tree {
   }
 
   reBalance() {
-    // call inOrder() on curr tree
     const inOrderArray = this.inOrder();
-    // from that array, call buildTree()
+
     this.root = this.buildTree(inOrderArray);
   }
 
   prettyPrint(node, prefix = "", isLeft = true) {
     if (node === null) {
+      console.log('root is null')
       return;
     }
+
     if (node.right !== null) {
       this.prettyPrint(
         node.right,
         `${prefix}${isLeft ? "│   " : "    "}`, false
       );
     }
+
     console.log(
       `${prefix}${isLeft ? "└── " : "┌── "}${node.value}`
     );
+
     if (node.left !== null) {
       this.prettyPrint(
         node.left,
@@ -346,13 +321,16 @@ class Tree {
 
 function createRandomBST() {
   const arr = createRandomNumArray(20);
-  const tree = new Tree;
+  const tree = new Tree();
 
-  tree.buildTree(arr);
+  tree.root = tree.buildTree(arr);
 
-  if (!tree.isBalanced()) {
+  tree.prettyPrint(tree.root);
+
+  while (!tree.isBalanced()) {
     tree.reBalance();
   }
+  console.log('tree is balanced');
 
   console.log("levelOrder: ", tree.levelOrder());
   console.log("preOrder: ", tree.preOrder());
@@ -360,14 +338,27 @@ function createRandomBST() {
   console.log("postOrder: ", tree.postOrder());
 
   for (let i = 0; i < 10; i++) {
-    tree.insert(Math.floor(Math.random() * 900) + 101);
+    let newNum = Math.floor(Math.random() * 900) + 101;
+    console.log('inserting', newNum, 'into tree');
+    tree.insert(newNum);
+  }
+  while (tree.isBalanced()) {
+    let newNum = Math.floor(Math.random() * 900) + 101
+    console.log('inserting', newNum, 'into tree');
+    tree.insert(newNum);
   }
 
-  while (tree.isBalanced()) {
-    tree.insert(Math.floor(Math.random() * 900) + 101);
+  if (!tree.isBalanced()) {
+    console.log('tree is unbalanced');
+    tree.prettyPrint(tree.root);
   }
 
   tree.reBalance();
+
+  if (tree.isBalanced()) {
+    console.log('tree is balanced');
+    tree.prettyPrint(tree.root);
+  }
 
   console.log("levelOrder: ", tree.levelOrder());
   console.log("preOrder: ", tree.preOrder());
@@ -386,38 +377,4 @@ function createRandomNumArray(num) {
   return arr
 }
 
-let test = new Tree();
-
-test.root = test.buildTree([1, 3, 2, 4, 8, 6, 7, 5, 9, 10]);
-
-test.prettyPrint(test.root);
-// console.log(test.preOrder(test.root));
-// console.log(test.inOrder(test.root));
-// console.log(test.postOrder(test.root));
-
-// console.log(test.find(3));
-
-// test.insert(20)
-// test.insert(13)
-// test.prettyPrint(test.root);
-
-// test.delete(6);
-// test.delete(5);
-// test.delete(3);
-// test.prettyPrint(test.root);
-
-// console.log(test.levelOrder());
-
-// console.log(test.height());
-
-// console.log(test.depth(test.find(1)));
-
-// console.log(test.isBalanced());
-// test.delete(4)
-// test.delete(1)
-// test.delete(2)
-// test.delete(5)
-// console.log(test.isBalanced());
-// test.reBalance();
-// console.log(test.isBalanced());
-// test.prettyPrint(test.root);
+createRandomBST();
