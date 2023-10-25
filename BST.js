@@ -73,8 +73,74 @@ class Tree {
   }
 
   delete(value) {
+    let curr = this.root;
     // find node with value
-    // delete node from tree
+    // if it doesn't exist, return
+    if (!this.find(value)) {
+      return;
+    }
+    // if node to be deleted is the root, parent doesn't need to be considered, so just move the root to the left or right if it exists, and then attach the other side to the bottom of the new tree
+    if (this.root.value === value) {
+      if (this.root.left) {
+        if (this.root.right) {
+          // if left and right side exist, move the root to the left side and set the right as needs to be attached
+          let nodeToBeAttached = this.root.right
+          this.root = this.root.left
+          // find right-most node of left side
+          curr = this.root
+          while (curr.right) {
+            curr = curr.right
+          }
+          // attach the right side to that node's right
+          curr.right = nodeToBeAttached;
+        } else {
+          // if no right side, just move the root down one
+          this.root = this.root.left
+        }
+      } else if (this.root.right) {
+        // if no left side, then just move the root down one
+        this.root = this.root.right
+      } else {
+        // if no children, set root to null
+        this.root = null
+      }
+    } else {
+      let parent = curr;
+      while (curr.value !== value) {
+        parent = curr;
+        if (value < curr.value) {
+          curr = curr.left;
+        } else if (value > curr.value) {
+          curr = curr.right;
+        }
+      }
+      // found node, need to attach its children somewhere on the parent
+      if (parent.right === curr) {
+        // attach parent's right to the deleted node's left
+        parent.right = curr.left;
+        // save a reference to the deleted node's right
+        let nodeToBeAttached = curr.right;
+        // traverse down to the parent's right-most node
+        curr = parent.right; 
+        while (curr.right) {
+          curr = curr.right;
+        }
+        // attach the deleted node's right side
+        curr.right = nodeToBeAttached;
+      } else {
+        // attach parent's left to the deleted node's right
+        parent.left = curr.right;
+        // save a reference to the deleted nodes' left
+        let nodeToBeAttached = curr.left;
+        // traverse down to the parent's left-most node
+        curr = parent.left;
+        while(curr.left) {
+          curr = curr.left;
+        }
+        // attach the deleted node's left side
+        curr.left = nodeToBeAttached;
+      }
+    }
     // rebalance tree?
   }
 
@@ -275,9 +341,15 @@ test.prettyPrint(test.root);
 // console.log(test.preOrder(test.root));
 // console.log(test.inOrder(test.root));
 // console.log(test.postOrder(test.root));
+
 // console.log(test.find(3));
 
-test.insert(20)
-test.insert(13)
-test.prettyPrint(test.root);
+// test.insert(20)
+// test.insert(13)
+// test.prettyPrint(test.root);
+
+// test.delete(6);
+// test.delete(5);
+// test.delete(3);
+// test.prettyPrint(test.root);
 
